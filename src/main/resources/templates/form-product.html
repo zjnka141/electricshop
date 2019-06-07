@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            crossorigin="anonymous"></script>
+    <title>Document</title>
+</head>
+
+<body>
+<div class="container col-md-4 offset-md-4">
+    <h3 th:if="${edit}" class="alert alert-danger text-center mt-4">Update sản phẩm</h3>
+    <h3 th:unless="${edit}" class="alert alert-danger text-center mt-4">Thêm sản phẩm</h3>
+    <form th:action="@{'/products/'+${action}}" method="post" class="p-3" th:object="${newProduct}">
+        <input th:if="${edit}" type="text" hidden th:field="*{id}">
+        <div class="form-group">
+            <label for="username">Tên:</label>
+            <input type="text" id="username" name="username" placeholder="Tên sản phẩm..." class="form-control" th:field="*{name}">
+            <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="text-danger"></p>
+        </div>
+        <div class="form-group">
+            <label for="price">Giá:</label>
+            <input type="text" id="price" name="price" placeholder="Giá sản phẩm..."
+                   class="form-control" th:field="*{price}">
+        </div>
+        <div class="form-group">
+            <label for="category">Danh mục:</label>
+            <select name="category" id="category" class="form-control" th:field="*{category}">
+                <option th:each="category:${categories}" th:value="${category.id}"
+                        th:text="${category.name}"></option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="producer">Hãng:</label>
+            <select name="producer" id="producer" class="form-control" th:field="*{producer}">
+                <option th:each="producer:${producers}" th:value="${producer.id}"
+                        th:text="${producer.name}"></option>
+            </select>
+        </div>
+        <div class="btn-group" style="width: 100%;">
+            <button th:if="${edit}" class="btn btn-success" type="submit" style="width: 50%;">Update</button>
+            <button th:unless="${edit}" class="btn btn-success" type="submit" style="width: 50%;">Thêm</button>
+            <a class="btn btn-danger" style="width: 50%;" th:href="@{/products/manager}">Hủy</a>
+        </div>
+
+    </form>
+</div>
+</body>
+</html>
