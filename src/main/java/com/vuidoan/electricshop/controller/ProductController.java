@@ -12,6 +12,8 @@ import com.vuidoan.electricshop.validation.Create;
 import com.vuidoan.electricshop.validation.Update;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -39,6 +41,8 @@ public class ProductController {
     public String manager(Model model){
         List<Product> products=productRepository.findAll();
         model.addAttribute("products",products);
+        model.addAttribute("categories",categoryRepository.findAll());
+        model.addAttribute("producers",producerRepository.findAll());
         model.addAttribute("tabManager",true);
         return "manager";
     }
@@ -50,16 +54,15 @@ public class ProductController {
         return "form-product";
     }
     @PostMapping("/add")
-    public String addProduct(@Validated @ModelAttribute("newProduct") ProductDTO productDTO,
-                             BindingResult bindingResult, Model model){
+    @ResponseBody
+    public ResponseEntity<?> addProduct(@Validated @RequestBody ProductDTO productDTO,
+                                     BindingResult bindingResult, Model model){
         if(bindingResult.hasErrors()){
-            addProductAttribute(model);
-//            model.addAttribute("newProduct",new ProductDTO());
-            model.addAttribute("action","add");
-            return "form-product";
+            return new ResponseEntity<List>(bindingResult.getAllErrors(), HttpStatus.OK);
         }
         productRepository.save(productMapper.toProduct(productDTO));
-        return "redirect:/products/manager";
+//        return "redirect:/products/manager";
+        return new ResponseEntity<>("Success",HttpStatus.OK);
     }
     @GetMapping("/delete/{id}")
     public String deleteProduct(@PathVariable("id") int id){

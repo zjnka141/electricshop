@@ -6,17 +6,10 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
           integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-            crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-            crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
-            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
-            crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css"
-            integrity="sha384-5sAR7xN1Nv6T6+dT2mhtzEpVJvfS3NScPQTrOxhwjIuvcA67KV2R5Jz6kr4abQsz" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css">
     <title>Document</title>
     <style>
         .search {
@@ -45,7 +38,7 @@
     <div class="collapse navbar-collapse" id="collapsibleNavId">
         <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
             <li class="nav-item">
-                <a class="nav-link"  th:href="@{/products}" th:text="#{home}"></a>
+                <a class="nav-link" th:href="@{/products}" th:text="#{home}"></a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="#" th:text="#{contact}"></a>
@@ -72,7 +65,8 @@
                         <a class="nav-link active" data-toggle="tab">Danh sách sản phẩm</a>
                     </li>
                     <li class="nav-item ml-auto">
-                        <a class="btn btn-primary" th:href="@{/products/add}"><i class="fas fa-plus"></i>Thêm sản phẩm</a>
+                        <button class="btn btn-primary" data-toggle="modal" data-target="#addModal"><i
+                                class="fas fa-plus"></i>Thêm sản phẩm</button>
                     </li>
                 </ul>
                 <div class="tab-content">
@@ -94,8 +88,12 @@
                                 <td th:text="${product.producer.getName()}"></td>
                                 <td>
                                     <div class="btn-group">
-                                        <a class="btn btn-warning" th:href="@{'/products/edit/'+${product.id}}">Sửa</a>
-                                        <a class="btn btn-danger" th:href="@{'/products/delete/'+${product.id}}">Xóa</a>
+                                        <a class="btn btn-warning" th:href="@{'/products/edit/'+${product.id}}">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button class="btn btn-danger"  th:attr="data-delete-id=${product.id}" data-toggle="modal" data-target="#deleteModal">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
@@ -106,12 +104,145 @@
             </div>
         </div>
     </div>
+    <div class="modal" id="addModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">Thêm sản phẩm</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <form id="myForm">
+                        <p class="text-success" id="add-success"></p>
+                        <input type="text" hidden>
+                        <div class="form-group">
+                            <label for="name">Tên:</label>
+                            <input type="text" id="name" name="name" placeholder="Tên sản phẩm..." class="form-control">
+                            <small id="error-name" class="text-danger"></small>
+                        </div>
+                        <div class="form-group">
+                            <label for="price">Giá:</label>
+                            <input type="number" id="price" name="price" placeholder="Giá sản phẩm..."
+                                   class="form-control">
+                            <small id="error-price" class="text-danger"></small>
+                        </div>
+                        <div class="form-group">
+                            <label for="category">Danh mục:</label>
+                            <select name="category" id="category" class="form-control">
+                                <option th:each="category:${categories}" th:value="${category.id}"
+                                        th:text="${category.name}"></option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="producer">Hãng:</label>
+                            <select name="producer" id="producer" class="form-control">
+                                <option th:each="producer:${producers}" th:value="${producer.id}"
+                                        th:text="${producer.name}"></option>
+                            </select>
+                        </div>
+                        <div class="btn-group" style="width: 100%;">
+                            <button class="btn btn-success" type="submit" style="width: 50%;" id="submitButton">Thêm
+                            </button>
+                            <button class="btn btn-danger" data-dismiss="modal" style="width: 50%;" onclick="window.location.href='/products/manager'">Close</button>
+                        </div>
+                    </form>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="deleteModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title text-danger">Xóa sản phẩm</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <p>Bạn muốn xóa sản phẩm này?</p>
+                    <div class="float-right">
+                        <a class="btn btn-success">Đồng ý
+                        </a>
+                        <button class="btn btn-danger" data-dismiss="modal">Hủy</button>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
 </div>
 <script>
-    document.getElementById("search_textbox").addEventListener("keydown", function(event) {
-        if(event.keyCode==13){
-            window.location.href = "/products/search?q="+document.getElementById("search_textbox").value;
-        }
+    $(document).ready(function () {
+        document.getElementById("search_textbox").addEventListener("keydown", function (event) {
+            if (event.keyCode == 13) {
+                window.location.href = "/products/search?q=" + document.getElementById("search_textbox").value;
+            }
+        });
+        $("#submitButton").click(function (event) {
+            // Stop default form Submit.
+            event.preventDefault();
+            product = {
+                "id": 0,
+                "name": $("#name").val(),
+                "price": $("#price").val(),
+                "category": {
+                    "id": $("#category").val()
+                },
+                "producer": {
+                    "id": $("#producer").val()
+                }
+            }
+            // product = $("#myForm").serialize()
+            console.log(JSON.stringify(product));
+            // Call Ajax Submit.
+            ajaxSubmitForm();
+        });
+
+        function ajaxSubmitForm() {
+            $.ajax({
+                type: "POST",
+                contentType: "application/json",
+                url: "/products/add",
+                data: JSON.stringify(product),
+                cache: false,
+                timeout: 6000,
+                success: function (data) {
+                    console.log(data);
+                    if (data != "Success") {
+                        $('small[id^="error"]').text('');
+                        $('#add-success').html("");
+                        $.each(data, function (index, errorMsg) {
+                            $('#error-' + errorMsg.field).text(errorMsg.defaultMessage);
+                        })
+                    } else {
+                        $('small[id^="error"]').text('');
+                        $('#add-success').html("<i class='fas fa-check-circle'></i> Đã thêm thành công");
+                        document.getElementById("myForm").reset();
+                    }
+                },
+                error: function (e) {
+                    console.log(e);
+                }
+            })
+        };
+        // Reset form when modal hidden
+        $('#addModal').on('hidden.bs.modal', function () {
+            $('small[id^="error"]').text('');
+            $('#add-success').html("");
+            document.getElementById("myForm").reset();
+        });
+        $('#deleteModal').on('show.bs.modal', function(e) {
+            var productId = $(e.relatedTarget).data('delete-id');
+            $(e.currentTarget).find('a').attr("href", "/products/delete/"+productId);
+        });
     });
 </script>
 </body>
